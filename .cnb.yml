@@ -29,5 +29,4 @@ main:
         - name: "部署流程"
           image: tencentcom/deploy-eopages:latest
           script: 
-            - cd .vitepress
             - edgeone pages deploy ./dist -n tuzi-async-draw -t $EO_SECRET
