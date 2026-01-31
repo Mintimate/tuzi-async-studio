@@ -22,8 +22,11 @@ watch(() => props.logs.length, () => {
 <template>
     <div class="bg-gray-900 rounded-xl shadow-inner border border-gray-800 p-4 mb-6 font-mono text-xs sm:text-sm h-64 overflow-y-auto custom-scrollbar flex flex-col" ref="logConsoleRef">
         <div v-if="logs.length === 0" class="flex flex-col items-center justify-center h-full text-gray-400 select-none">
-            <span class="animate-pulse mb-2">...等待任务启动...</span>
-            <a href="https://afdian.com/a/mintimate" target="_blank" class="text-xs text-purple-200 hover:text-purple-400 transition-colors">
+            <pre class="mb-3 text-sm sm:text-base leading-tight font-mono text-gray-300 select-none text-center ascii-cat">(\_/)
+( <span class="eye">o</span>.<span class="eye">o</span> )
+/> <\</pre>
+            <span class="animate-pulse mb-2">...等待任务启动，好奇地等待中...</span>
+            <a href="https://afdian.com/a/mintimate" target="_blank" class="text-xs text-purple-200 hover:text-purple-400 transition-colors mt-1">
                 ⚡ 支持一下 (爱发电) ⚡
             </a>
         </div>
@@ -44,3 +47,22 @@ watch(() => props.logs.length, () => {
         </div>
     </div>
 </template>
+
+<style scoped>
+/* ASCII cat eye blinking */
+.eye {
+  display: inline-block;
+  transform-origin: center center;
+  animation: blink 4s infinite;
+}
+@keyframes blink {
+  0%, 92%, 100% { transform: scaleY(1); }
+  93%, 95% { transform: scaleY(0.05); }
+}
+/* Slight float to make the cat feel alive */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-2px); }
+}
+.ascii-cat { display: inline-block; animation: float 3s ease-in-out infinite; }
+</style>
