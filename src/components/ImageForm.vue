@@ -8,7 +8,7 @@ const props = defineProps({
 const emit = defineEmits(['submit']);
 
 const form = reactive({
-    model: 'gemini-3-pro-image-preview-async',
+    model: 'gemini-3-pro-image-preview-4k-async',
     size: '', 
     prompt: '',
     files: [],
@@ -36,10 +36,11 @@ const handleSubmit = () => {
         <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">模型 (Model)</label>
             <select v-model="form.model" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md border">
-                <option value="gemini-3-pro-image-preview-async">Gemini 3 Pro (1k)</option>
-                <option value="gemini-3-pro-image-preview-2k-async">Gemini 3 Pro (2k)</option>
-                <option value="gemini-3-pro-image-preview-4k-async">Gemini 3 Pro (4k)</option>
+                <option value="gemini-3-pro-image-preview-async">Gemini 3 Pro x Nano Banana 2(1k)</option>
+                <option value="gemini-3-pro-image-preview-2k-async">Gemini 3 Pro x Nano Banana 2 (2k)</option>
+                <option value="gemini-3-pro-image-preview-4k-async">Gemini 3 Pro x Nano Banana 2 (4k)</option>
             </select>
+            <p class="mt-1 text-xs text-gray-400">实际值: {{ form.model }}</p>
         </div>
 
         <div>
@@ -58,6 +59,7 @@ const handleSubmit = () => {
                     <option value="9:16">9:16</option>
                 </select>
             </div>
+            <p class="mt-1 text-xs text-gray-400">实际值: {{ form.size || '""' }}</p>
         </div>
 
         <div>

@@ -44,6 +44,7 @@ const handleSubmit = () => {
                 <option value="veo3.1-components">Veo 3.1 Components</option>
                 <option value="veo3.1-components-4k">Veo 3.1 Components 4K</option>
             </select>
+            <p class="mt-1 text-xs text-gray-400">实际值: {{ form.model }}</p>
         </div>
 
         <div class="grid grid-cols-2 gap-4">
@@ -53,6 +54,7 @@ const handleSubmit = () => {
                     <option value="">默认 (不指定)</option>
                     <option value="8">8 秒</option>
                 </select>
+                <p class="mt-1 text-xs text-gray-400">实际值: {{ form.seconds || '""' }}</p>
             </div>
              <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">尺寸 (Size)</label>
@@ -61,6 +63,7 @@ const handleSubmit = () => {
                     <option value="1280x720">1280x720 (横屏)</option>
                     <option value="720x1280">720x1280 (竖屏)</option>
                 </select>
+                <p class="mt-1 text-xs text-gray-400">实际值: {{ form.size || '""' }}</p>
             </div>
         </div>
 
@@ -69,6 +72,7 @@ const handleSubmit = () => {
                 <input type="checkbox" v-model="form.watermark" class="rounded text-purple-600 focus:ring-purple-500 border-gray-300 h-4 w-4">
                 <span class="text-sm text-gray-700 font-medium">添加水印 (Watermark)</span>
             </label>
+            <p class="mt-1 text-xs text-gray-400 pl-6">实际值: {{ form.watermark }}</p>
         </div>
 
         <div>
