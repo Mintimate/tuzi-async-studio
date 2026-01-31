@@ -21,8 +21,11 @@ watch(() => props.logs.length, () => {
 
 <template>
     <div class="bg-gray-900 rounded-xl shadow-inner border border-gray-800 p-4 mb-6 font-mono text-xs sm:text-sm h-64 overflow-y-auto custom-scrollbar flex flex-col" ref="logConsoleRef">
-        <div v-if="logs.length === 0" class="flex items-center justify-center h-full text-gray-700 select-none">
-            <span class="animate-pulse">等待任务启动...</span>
+        <div v-if="logs.length === 0" class="flex flex-col items-center justify-center h-full text-gray-400 select-none">
+            <span class="animate-pulse mb-2">...等待任务启动...</span>
+            <a href="https://afdian.com/a/mintimate" target="_blank" class="text-xs text-purple-200 hover:text-purple-400 transition-colors">
+                ⚡ 支持一下 (爱发电) ⚡
+            </a>
         </div>
         <div v-for="log in logs" :key="log.id" class="mb-1 break-all flex items-start">
             <span class="text-gray-500 mr-2 shrink-0 select-none">[{{ log.time }}]</span>
