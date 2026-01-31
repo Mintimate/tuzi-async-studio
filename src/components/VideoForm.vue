@@ -77,7 +77,10 @@ const handleSubmit = () => {
         </div>
 
         <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">参考图 (输入首帧/尾帧)</label>
+            <label class="block text-sm font-medium text-gray-700 mb-2">参考图 (input_reference)</label>
+            <p class="text-xs text-gray-500 mb-2">
+                Veo3.1/Pro 支持首帧和尾帧，Veo3.1-components 支持多达 3 张参考图。
+            </p>
             
             <div class="w-full">
                 <label class="flex justify-center w-full h-32 px-4 transition bg-white border-2 border-gray-300 border-dashed rounded-xl appearance-none cursor-pointer hover:border-purple-500 hover:bg-purple-50 focus:outline-none relative overflow-hidden">
@@ -85,12 +88,12 @@ const handleSubmit = () => {
                     <div v-if="form.files && form.files.length > 0" class="flex flex-col items-center justify-center h-full text-green-600">
                             <svg class="w-8 h-8 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
                         <span class="text-sm font-medium">{{ form.files.length }} 个文件已选择</span>
-                        <span class="text-xs text-green-500 mt-1">点击更换</span>
+                        <span class="text-xs text-green-500 mt-1">点击更换 (支持多选)</span>
                     </div>
 
                     <div v-else class="flex flex-col items-center justify-center h-full">
                         <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
-                        <span class="mt-2 text-sm text-gray-500">点击上传首帧/尾帧图片</span>
+                        <span class="mt-2 text-sm text-gray-500">点击上传图片 (支持多张)</span>
                     </div>
                     
                     <input type="file" ref="fileInput" @change="handleFileChange" accept="image/*" multiple class="hidden">
