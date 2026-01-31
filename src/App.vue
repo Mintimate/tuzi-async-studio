@@ -241,11 +241,11 @@ const queryTask = async () => {
                             </div>
                             <div>
                                 <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">Token</label>
-                                <div class="flex rounded-md shadow-sm">
-                                    <input v-model="config.token" :type="showToken ? 'text' : 'password'" placeholder="sk-..." class="flex-1 block w-full px-3 py-2 rounded-none rounded-l-md border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm z-10">
-                                    <button type="button" @click="showToken = !showToken" class="-ml-px relative inline-flex items-center px-3 py-2 border border-gray-300 text-sm font-medium rounded-r-md text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500" title="显示/隐藏 Token">
-                                        <svg v-if="showToken" class="h-4 w-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" /></svg>
-                                        <svg v-else class="h-4 w-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                                <div class="flex items-center w-full rounded-md border border-gray-300 shadow-sm focus-within:border-indigo-500 focus-within:ring-1 focus-within:ring-indigo-500 bg-white">
+                                    <input v-model="config.token" :type="showToken ? 'text' : 'password'" placeholder="sk-..." class="flex-1 block w-full px-3 py-2 border-0 focus:ring-0 sm:text-sm bg-transparent rounded-l-md">
+                                    <button type="button" @click="showToken = !showToken" class="px-3 py-2 text-gray-400 hover:text-indigo-600 focus:outline-none rounded-r-md flex items-center" title="显示/隐藏 Token">
+                                        <svg v-if="showToken" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" /></svg>
+                                        <svg v-else class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
                                     </button>
                                 </div>
                             </div>
@@ -301,13 +301,11 @@ const queryTask = async () => {
                         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-gray-100 pb-4 mb-4">
                             <h2 class="text-xl font-bold text-gray-900">任务状态</h2>
                             <div class="flex gap-2">
-                                <div class="relative w-full sm:w-64">
-                                     <input v-model="queryTaskId" type="text" class="w-full pl-3 pr-10 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="任务 ID">
-                                     <div class="absolute inset-y-0 right-0 flex items-center bg-transparent">
-                                         <button @click="queryTask" :disabled="!queryTaskId || loading.query" class="h-full px-3 text-gray-400 hover:text-indigo-600 transition-colors">
-                                             <svg class="w-5 h-5" :class="{'animate-spin': loading.query}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                                         </button>
-                                     </div>
+                                <div class="flex items-center rounded-md border border-gray-300 shadow-sm w-full sm:w-64 focus-within:border-indigo-500 focus-within:ring-1 focus-within:ring-indigo-500 bg-white">
+                                    <input v-model="queryTaskId" type="text" class="flex-1 block w-full px-3 py-2 border-none focus:ring-0 sm:text-sm bg-transparent rounded-l-md" placeholder="任务 ID">
+                                    <button type="button" @click="queryTask" :disabled="!queryTaskId || loading.query" class="px-3 py-2 text-gray-400 hover:text-indigo-600 focus:outline-none rounded-r-md flex items-center" title="查询任务">
+                                        <svg class="w-5 h-5" :class="{'animate-spin': loading.query}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                                    </button>
                                 </div>
                                 <button @click="toggleAutoRefresh" :disabled="!queryTaskId" 
                                     :class="isAutoRefreshing ? 'bg-red-50 text-red-600 hover:bg-red-100 border-red-200' : 'bg-gray-50 text-gray-600 hover:bg-gray-100 border-gray-200'"
