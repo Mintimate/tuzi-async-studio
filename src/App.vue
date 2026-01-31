@@ -1,11 +1,32 @@
 <script setup>
-import { reactive, ref, watch } from 'vue';
+import { reactive, ref, watch, nextTick } from 'vue';
 import axios from 'axios';
 
 const config = reactive({
     baseUrl: localStorage.getItem('tuzi_api_base_url') || 'https://api.tu-zi.com',
     token: localStorage.getItem('tuzi_api_token') || ''
 });
+
+// Logs System
+const logs = ref([]);
+const logConsoleRef = ref(null);
+
+const addLog = (content, type = 'info') => {
+    const now = new Date();
+    const time = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`;
+    logs.value.push({
+        id: Date.now() + Math.random(),
+        time,
+        content,
+        type
+    });
+    
+    nextTick(() => {
+        if (logConsoleRef.value) {
+            logConsoleRef.value.scrollTop = logConsoleRef.value.scrollHeight;
+        }
+    });
+};
 
 // 自动保存配置
 watch(() => config.baseUrl, (val) => localStorage.setItem('tuzi_api_base_url', val));
@@ -47,6 +68,8 @@ const submitTask = async () => {
     loading.submit = true;
     error.submit = null;
     submitResult.value = null;
+    logs.value = []; // 清空之前的日志
+    addLog(`开始创建任务 [${form.model}]...`, 'info');
 
     try {
         const formData = new FormData();
@@ -58,14 +81,18 @@ const submitTask = async () => {
         if (form.files && form.files.length > 0) {
             form.files.forEach(file => {
                 formData.append('input_reference', file);
+                addLog(`添加参考图片: ${file.name}`, 'info');
             });
         } else if (form.imageUrl) {
             // 支持用换行、逗号或空格分隔的多个 URL
             const urls = form.imageUrl.split(/[\n,\s]+/).map(u => u.trim()).filter(u => u);
             urls.forEach(url => {
                 formData.append('input_reference', url);
+                addLog(`添加参考 URL: ${url}`, 'info');
             });
         }
+
+        addLog('正在向服务器提交请求...', 'info');
 
         const response = await axios.post(`${config.baseUrl.replace(/\/$/, '')}/v1/videos`, formData, {
             headers: {
@@ -75,16 +102,21 @@ const submitTask = async () => {
         });
 
         submitResult.value = response.data;
+        addLog(`任务提交成功! ID: ${response.data.id}`, 'success');
+
         if (response.data.id) {
             queryTaskId.value = response.data.id;
             // 启动自动轮询
+            addLog(`准备开始轮询任务状态...`, 'info');
             startPolling(response.data.id);
         }
     } catch (err) {
         console.error(err);
-        error.submit = err.response ? 
+        const errMsg = err.response ? 
             `Error ${err.response.status}: ${JSON.stringify(err.response.data)}` : 
             err.message;
+        error.submit = errMsg;
+        addLog(`任务提交失败: ${errMsg}`, 'error');
     } finally {
         loading.submit = false;
     }
@@ -109,6 +141,8 @@ const startPolling = (taskId) => {
     stopPolling(); 
     isAutoRefreshing.value = true;
     
+    // addLog(`开始轮询任务: ${taskId}`, 'info'); // 上面已经加过了
+    
     const interval = 5000; // 5 seconds
     
     const poll = async () => {
@@ -124,8 +158,14 @@ const startPolling = (taskId) => {
             const data = response.data;
             queryResult.value = data;
             
+            addLog(`状态更新: [${data.status}] 进度: ${data.progress || 0}%`, 
+                data.status === 'completed' ? 'success' : (data.status === 'failed' ? 'error' : 'info')
+            );
+
             if (data.status === 'completed' || data.status === 'failed') {
                 isAutoRefreshing.value = false; // 完成后停止
+                if (data.status === 'completed') addLog('任务已完成!', 'success');
+                if (data.status === 'failed') addLog('任务执行失败.', 'error');
                 return;
             }
             
@@ -136,6 +176,7 @@ const startPolling = (taskId) => {
             
         } catch (err) {
             console.error("Polling error:", err);
+            addLog(`轮询请求出错: ${err.message}`, 'warning');
                 // 出错继续尝试 (网络波动等)，直到用户手动停止
                 if (isAutoRefreshing.value) {
                 pollingTimer.value = setTimeout(poll, interval);
@@ -144,7 +185,7 @@ const startPolling = (taskId) => {
     };
     
     // 建议等待
-    pollingTimer.value = setTimeout(poll, interval);
+    pollingTimer.value = setTimeout(poll, 1000); // 首次稍微快一点
 };
 
 const toggleAutoRefresh = () => {
@@ -163,6 +204,7 @@ const queryTask = async () => {
     
     loading.query = true;
     error.query = null;
+    addLog(`手动查询任务: ${queryTaskId.value}`, 'info');
     
     try {
         const response = await axios.get(`${config.baseUrl.replace(/\/$/, '')}/v1/videos/${queryTaskId.value}`, {
@@ -172,11 +214,14 @@ const queryTask = async () => {
         });
         
         queryResult.value = response.data;
+        addLog(`查询成功: [${response.data.status}]`, 'success');
     } catch (err) {
         console.error(err);
-        error.query = err.response ? 
+        const errMsg = err.response ? 
             `Error ${err.response.status}: ${JSON.stringify(err.response.data)}` : 
             err.message;
+        error.query = errMsg;
+        addLog(`查询失败: ${errMsg}`, 'error');
     } finally {
         loading.query = false;
     }
@@ -337,29 +382,27 @@ const queryTask = async () => {
                             </div>
                         </div>
 
-                        <!-- Feedback Messages -->
-                        <transition-group name="fade">
-                            <div v-if="error.submit" key="err-submit" class="mb-4 p-4 rounded-lg bg-red-50 border border-red-200 flex items-start gap-3">
-                                <svg class="w-5 h-5 text-red-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                <div class="text-sm text-red-700">{{ error.submit }}</div>
+                        <!-- Feedback Messages (Replaced by Console) -->
+                        <div class="bg-gray-900 rounded-xl shadow-inner border border-gray-800 p-4 mb-6 font-mono text-xs sm:text-sm h-64 overflow-y-auto custom-scrollbar flex flex-col" ref="logConsoleRef">
+                            <div v-if="logs.length === 0" class="flex items-center justify-center h-full text-gray-700 select-none">
+                                <span class="animate-pulse">等待任务启动...</span>
                             </div>
-                             <div v-if="error.query" key="err-query" class="mb-4 p-4 rounded-lg bg-red-50 border border-red-200 flex items-start gap-3">
-                                <svg class="w-5 h-5 text-red-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                <div class="text-sm text-red-700">{{ error.query }}</div>
+                            <div v-for="log in logs" :key="log.id" class="mb-1 break-all flex items-start">
+                                <span class="text-gray-500 mr-2 shrink-0 select-none">[{{ log.time }}]</span>
+                                <span :class="{
+                                    'text-blue-400': log.type === 'info',
+                                    'text-green-400': log.type === 'success',
+                                    'text-red-400': log.type === 'error',
+                                    'text-yellow-400': log.type === 'warning'
+                                }">
+                                    <span v-if="log.type === 'info'" class="mr-1">ℹ️</span>
+                                    <span v-else-if="log.type === 'success'" class="mr-1">✅</span>
+                                    <span v-else-if="log.type === 'error'" class="mr-1">❌</span>
+                                    <span v-else-if="log.type === 'warning'" class="mr-1">⚠️</span>
+                                    {{ log.content }}
+                                </span>
                             </div>
-                            <div v-if="submitResult" key="success-submit" class="mb-4 p-4 rounded-lg bg-green-50 border border-green-200">
-                                <div class="flex items-center justify-between mb-2">
-                                    <h3 class="text-sm font-bold text-green-800 flex items-center">
-                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                                        提交成功
-                                    </h3>
-                                    <span class="px-2 py-0.5 rounded text-xs font-bold bg-green-100 text-green-700">{{ submitResult.status }}</span>
-                                </div>
-                                <div class="text-xs text-green-700 break-all font-mono bg-white/50 p-2 rounded border border-green-100">
-                                    {{ submitResult.id }}
-                                </div>
-                            </div>
-                        </transition-group>
+                        </div>
 
                         <!-- Preview Area -->
                         <div class="border-2 border-dashed border-gray-200 rounded-xl min-h-[400px] flex flex-col items-center justify-center bg-gray-50/50 relative overflow-hidden group">
