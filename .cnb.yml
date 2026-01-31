@@ -7,7 +7,7 @@ main:
         - name: 自动同步代码
           image: tencentcom/git-sync
           settings:
-            target_url: https://github.com/Mintimate/tuzi-async-draw.git
+            target_url: https://github.com/Mintimate/tuzi-async-studio.git
             auth_type: https
             username: ${GIT_USERNAME}
             password: ${GIT_ACCESS_TOKEN}
@@ -29,4 +29,4 @@ main:
         - name: "部署流程"
           image: tencentcom/deploy-eopages:latest
           script: 
-            - edgeone pages deploy ./dist -n tuzi-async-draw -t $EO_SECRET
+            - edgeone pages deploy ./dist -n tuzi-async-studio -t $EO_SECRET

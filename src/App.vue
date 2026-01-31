@@ -352,8 +352,8 @@ const queryTask = async () => {
             <!-- Footer -->
             <footer class="mt-12 text-center border-t border-gray-200 pt-8">
                 <div class="flex flex-wrap justify-center gap-6 mb-4">
-                    <a href="https://github.com/Mintimate/tuzi-async-draw" target="_blank" class="text-sm font-medium text-gray-500 hover:text-indigo-600 transition-colors">GitHub</a>
-                    <a href="https://cnb.cool/Mintimate/tool-forge/tuzi-async-draw" target="_blank" class="text-sm font-medium text-gray-500 hover:text-indigo-600 transition-colors">CNB 镜像</a>
+                    <a href="https://github.com/Mintimate/tuzi-async-studio" target="_blank" class="text-sm font-medium text-gray-500 hover:text-indigo-600 transition-colors">GitHub</a>
+                    <a href="https://cnb.cool/Mintimate/tool-forge/tuzi-async-studio" target="_blank" class="text-sm font-medium text-gray-500 hover:text-indigo-600 transition-colors">CNB 镜像</a>
                 </div>
                 <p class="text-sm text-gray-400">Mintimate 打造 · EdgeOne Pages 驱动</p>
             </footer>
