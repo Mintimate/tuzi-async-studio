@@ -52,3 +52,5 @@ coverage/
 /.next/
 /.nuxt/
 
+# EdgeOne Pages
+.edgeone/

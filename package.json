@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@simplewebauthn/browser": "^13.2.2",
     "axios": "^1.7.0",
     "vue": "^3.4.0"
   },
