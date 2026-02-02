@@ -6,6 +6,7 @@ import VideoForm from './components/VideoForm.vue';
 import LogConsole from './components/LogConsole.vue';
 import ResultDisplay from './components/ResultDisplay.vue';
 import PasskeyManager from './components/PasskeyManager.vue';
+import UsageGuide from './components/UsageGuide.vue';
 
 const config = reactive({
     baseUrl: localStorage.getItem('tuzi_api_base_url') || 'https://api.tu-zi.com',
@@ -341,7 +342,10 @@ const queryTask = async () => {
                         </div>
 
                         <!-- Logs Console -->
-                        <LogConsole :logs="logs" />
+                        <LogConsole v-if="!queryResult || logs.length > 0" :logs="logs" />
+
+                        <!-- Usage Guide -->
+                        <UsageGuide v-if="!queryResult && logs.length === 0 && !loading.submit && !loading.query" />
 
                         <!-- Result Display -->
                         <ResultDisplay :result="queryResult" :loading="loading.submit || loading.query" :mode="activeTab" />
