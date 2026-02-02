@@ -40,6 +40,16 @@ const addLog = (content, type = 'info') => {
     });
 };
 
+// 状态格式化映射，帮助把后端不一致的 status 转成人类可读的中文与样式
+const statusInfo = (s) => {
+    const n = (s || '').toString().toLowerCase();
+    if (n === 'completed') return { label: '已完成', colorClass: 'text-green-600', icon: '✅', pulse: false, level: 'success' };
+    if (n === 'failed' || n === 'error') return { label: '执行失败', colorClass: 'text-red-600', icon: '❌', pulse: false, level: 'error' };
+    if (n === 'queued' || n === 'waiting' || n === 'created') return { label: '排队中', colorClass: 'text-yellow-600', icon: '⏳', pulse: true, level: 'info' };
+    if (n === 'processing' || n === 'in_progress' || n === 'inpropress' || n === 'in_propress' || n === 'running') return { label: '处理中', colorClass: 'text-yellow-600', icon: '⚙️', pulse: true, level: 'info' };
+    return { label: s || '-', colorClass: 'text-gray-600', icon: '', pulse: false, level: 'info' };
+};
+
 // 自动保存配置
 watch(() => config.baseUrl, (val) => localStorage.setItem('tuzi_api_base_url', val));
 watch(() => config.token, (val) => localStorage.setItem('tuzi_api_token', val));
@@ -110,6 +120,7 @@ const submitTask = async (formDataObj) => {
 
         submitResult.value = response.data;
         addLog(`任务提交成功! ID: ${response.data.id}`, 'success');
+        addLog(`需要注意，任务可能需要几分钟才能完成，尤其是高分辨率`, 'success');
 
         if (response.data.id) {
             queryTaskId.value = response.data.id;
@@ -159,14 +170,13 @@ const startPolling = (taskId) => {
             const data = response.data;
             queryResult.value = data;
             
-            addLog(`状态更新: [${data.status}] 进度: ${data.progress || 0}%`, 
-                data.status === 'completed' ? 'success' : (data.status === 'failed' ? 'error' : 'info')
-            );
+            const st = statusInfo(data.status);
+            addLog(`状态更新: ${st.icon} ${st.label} (${data.status})`, st.level);
 
             if (data.status === 'completed' || data.status === 'failed') {
-                isAutoRefreshing.value = false; 
-                if (data.status === 'completed') addLog('任务已完成!', 'success');
-                if (data.status === 'failed') addLog('任务执行失败.', 'error');
+                isAutoRefreshing.value = false;
+                if (data.status === 'completed') addLog(`任务已完成! ${statusInfo(data.status).icon}`, 'success');
+                if (data.status === 'failed') addLog(`任务执行失败. ${statusInfo(data.status).icon}`, 'error');
                 return;
             }
             
@@ -211,7 +221,7 @@ const queryTask = async () => {
         });
         
         queryResult.value = response.data;
-        addLog(`查询成功: [${response.data.status}]`, 'success');
+        addLog(`查询成功: ${statusInfo(response.data.status).icon} ${statusInfo(response.data.status).label} (${response.data.status})`, 'success');
     } catch (err) {
         console.error(err);
         const errMsg = err.response ? 
@@ -354,14 +364,24 @@ const queryTask = async () => {
                          <div v-if="queryResult" class="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-4 p-4 bg-gray-50 rounded-xl text-xs sm:text-sm border border-gray-100">
                              <div>
                                  <span class="block text-gray-400 font-medium uppercase tracking-wider text-[10px]">Status</span>
-                                 <span :class="{'text-green-600': queryResult.status === 'completed', 'text-yellow-600': queryResult.status === 'processing' || queryResult.status === 'queued', 'text-red-600': queryResult.status === 'failed'}" class="font-bold flex items-center">
-                                     <span v-if="queryResult.status === 'processing' || queryResult.status === 'queued'" class="w-2 h-2 rounded-full bg-yellow-400 mr-1.5 animate-pulse"></span>
-                                     {{ queryResult.status }}
+                                 <span :class="statusInfo(queryResult.status).colorClass" class="font-bold flex items-center">
+                                     <span v-if="statusInfo(queryResult.status).pulse" class="relative flex h-2 w-2 mr-2">
+                                         <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75"></span>
+                                         <span class="relative inline-flex rounded-full h-2 w-2 bg-yellow-400"></span>
+                                     </span>
+                                     <span class="mr-2">{{ statusInfo(queryResult.status).icon }}</span>
+                                     <span>{{ statusInfo(queryResult.status).label }}</span>
+                                     <span class="text-gray-400 ml-2 text-xs">({{ queryResult.status }})</span>
                                  </span>
                              </div>
                              <div>
                                  <span class="block text-gray-400 font-medium uppercase tracking-wider text-[10px]">Progress</span>
-                                 <span class="font-medium text-gray-700">{{ queryResult.progress || 0 }}%</span>
+                                 <div class="w-full">
+                                     <div class="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+                                         <div :style="{ width: (queryResult.progress || 0) + '%' }" class="h-full bg-indigo-500"></div>
+                                     </div>
+                                     <div class="mt-1 text-xs text-gray-500">{{ queryResult.progress || 0 }}%</div>
+                                 </div>
                              </div>
                              <div class="col-span-2 sm:col-span-2">
                                  <span class="block text-gray-400 font-medium uppercase tracking-wider text-[10px]">Created</span>
