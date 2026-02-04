@@ -1,6 +1,6 @@
 <script setup>
 import axios from 'axios';
-import { reactive, ref, watch } from 'vue';
+import { reactive, ref, watch, onMounted } from 'vue';
 import ImageForm from './components/ImageForm.vue';
 import LogConsole from './components/LogConsole.vue';
 import PasskeyManager from './components/PasskeyManager.vue';
@@ -27,6 +27,25 @@ const config = reactive({
 
 // Token visibility
 const showToken = ref(false);
+
+// Passkey Status
+const isPasskeyEnabled = ref(false);
+const checkPasskeyStatus = async () => {
+    try {
+        const response = await fetch('/api/system');
+        if (response.ok) {
+            const data = await response.json();
+            isPasskeyEnabled.value = !!(data.config && data.config.kvEnabled);
+        }
+    } catch (err) {
+        console.error('Failed to check passkey status:', err);
+        isPasskeyEnabled.value = false;
+    }
+};
+
+onMounted(() => {
+    checkPasskeyStatus();
+});
 
 // Passkey 登录回调
 const handlePasskeyLogin = ({ username, token }) => {
@@ -311,7 +330,7 @@ const queryTask = async () => {
                                 </div>
 
                                 <!-- Passkey 快捷入口 -->
-                                <div class="mt-3">
+                                <div v-if="isPasskeyEnabled" class="mt-3">
                                     <PasskeyManager 
                                         :base-url="config.baseUrl" 
                                         :current-token="config.token"
