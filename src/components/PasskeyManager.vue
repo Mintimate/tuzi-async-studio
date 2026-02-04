@@ -395,10 +395,10 @@ defineExpose({
       <button 
         v-if="!iconOnly"
         @click="openModal('login')"
-        class="w-full flex items-center justify-center px-4 py-2 border border-dashed border-gray-300 rounded-lg text-xs font-medium text-gray-500 hover:text-indigo-600 hover:border-indigo-300 hover:bg-indigo-50/50 transition-all group"
+        class="w-full flex items-center justify-center px-4 py-2 border border-dashed border-gray-300 dark:border-gray-600 rounded-lg text-xs font-medium text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:border-indigo-300 dark:hover:border-indigo-600 hover:bg-indigo-50/50 dark:hover:bg-indigo-900/20 transition-all group"
         title="快速登录"
       >
-        <svg class="w-4 h-4 mr-1.5 text-gray-400 group-hover:text-indigo-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg class="w-4 h-4 mr-1.5 text-gray-400 dark:text-gray-500 group-hover:text-indigo-500 dark:group-hover:text-indigo-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
         </svg>
         Passkey 填充 Token
@@ -406,7 +406,7 @@ defineExpose({
       <button 
         v-else
         @click="openModal('login')"
-        class="px-3 py-2 text-gray-400 hover:text-indigo-600 focus:outline-none flex items-center transition-colors border-l border-gray-100"
+        class="px-3 py-2 text-gray-400 dark:text-gray-500 hover:text-indigo-600 dark:hover:text-indigo-400 focus:outline-none flex items-center transition-colors border-l border-gray-100 dark:border-gray-700"
         title="使用 Passkey 保存/填充 Token"
       >
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -416,7 +416,7 @@ defineExpose({
     </div>
     
     <!-- 不支持提示 -->
-    <div v-else-if="!iconOnly" class="text-xs text-gray-400 flex items-center gap-1">
+    <div v-else-if="!iconOnly" class="text-xs text-gray-400 dark:text-gray-500 flex items-center gap-1">
       <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
       </svg>
@@ -435,7 +435,7 @@ defineExpose({
           leave-from-class="opacity-100"
           leave-to-class="opacity-0"
         >
-          <div class="absolute inset-0 bg-gray-900/60 backdrop-blur-sm" @click="showModal = false"></div>
+          <div class="absolute inset-0 bg-gray-900/60 dark:bg-gray-900/80 backdrop-blur-sm" @click="showModal = false"></div>
         </transition>
         
         <!-- 弹窗内容 -->
@@ -447,14 +447,14 @@ defineExpose({
           leave-from-class="opacity-100 scale-100 translate-y-0"
           leave-to-class="opacity-0 scale-95 translate-y-4"
         >
-          <div class="relative bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden ring-1 ring-gray-900/5">
+          <div class="relative bg-white dark:bg-gray-800 rounded-2xl shadow-xl w-full max-w-md overflow-hidden ring-1 ring-gray-900/5 dark:ring-gray-700/50">
             <!-- 标题栏 -->
-            <div class="px-6 py-5 border-b border-gray-100 flex items-center justify-between bg-white">
+            <div class="px-6 py-5 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between bg-white dark:bg-gray-800">
               <div>
-                <h3 class="text-lg font-bold text-gray-900">Passkey 管理</h3>
-                <p class="text-xs text-gray-500 mt-0.5">安全、快速的无密码体验。（使用 Passkey 云同步 Token）</p>
+                <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100">Passkey 管理</h3>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">安全、快速的无密码体验。（使用 Passkey 云同步 Token）</p>
               </div>
-              <button @click="showModal = false" class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
+              <button @click="showModal = false" class="p-2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                 </svg>
@@ -463,18 +463,18 @@ defineExpose({
             
             <!-- 标签切换 (Segmented Control) -->
             <div class="px-6 pt-6 pb-2">
-              <div class="flex p-1 bg-gray-100 rounded-xl">
+              <div class="flex p-1 bg-gray-100 dark:bg-gray-700 rounded-xl">
                 <button 
                   @click="modalTab = 'login'"
                   class="flex-1 py-2 text-sm font-medium rounded-lg transition-all"
-                  :class="modalTab === 'login' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'"
+                  :class="modalTab === 'login' ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-gray-100 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'"
                 >
                   🔐 登录
                 </button>
                 <button 
                   @click="handleRegisterClick"
                   class="flex-1 py-2 text-sm font-medium rounded-lg transition-all"
-                  :class="modalTab === 'register' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'"
+                  :class="modalTab === 'register' ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-gray-100 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'"
                 >
                   ➕ 注册
                 </button>
@@ -482,7 +482,7 @@ defineExpose({
                   v-if="showManageTab"
                   @click="modalTab = 'manage'; loadCredentials()"
                   class="flex-1 py-2 text-sm font-medium rounded-lg transition-all"
-                  :class="modalTab === 'manage' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'"
+                  :class="modalTab === 'manage' ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-gray-100 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'"
                 >
                   ⚙️ 管理
                 </button>
@@ -494,13 +494,13 @@ defineExpose({
               <!-- 登录标签 -->
               <div v-show="modalTab === 'login'" class="space-y-6">
                 <div class="text-center py-4">
-                  <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-indigo-50 mb-4 text-indigo-600">
+                  <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-indigo-50 dark:bg-indigo-900/20 mb-4 text-indigo-600 dark:text-indigo-400">
                     <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
                     </svg>
                   </div>
-                  <h4 class="text-base font-semibold text-gray-900">欢迎回来</h4>
-                  <p class="text-sm text-gray-500 mt-1 max-w-xs mx-auto">
+                  <h4 class="text-base font-semibold text-gray-900 dark:text-gray-100">欢迎回来</h4>
+                  <p class="text-sm text-gray-500 dark:text-gray-400 mt-1 max-w-xs mx-auto">
                     点击下方按钮唤起系统 Passkey 验证，验证成功后将自动填入 Token。
                   </p>
                 </div>
@@ -508,7 +508,7 @@ defineExpose({
                 <button 
                   @click="loginWithPasskey"
                   :disabled="loading.login"
-                  class="w-full py-3.5 px-4 bg-gray-900 text-white font-medium rounded-xl hover:bg-gray-800 hover:shadow-lg hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-none transition-all flex items-center justify-center gap-2"
+                  class="w-full py-3.5 px-4 bg-gray-900 dark:bg-gray-700 text-white font-medium rounded-xl hover:bg-gray-800 dark:hover:bg-gray-600 hover:shadow-lg hover:-translate-y-0.5 dark:hover:shadow-none focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-gray-800 focus:ring-gray-900 dark:focus:ring-gray-700 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-none transition-all flex items-center justify-center gap-2"
                 >
                   <svg v-if="loading.login" class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -520,18 +520,18 @@ defineExpose({
               
               <!-- 注册标签 -->
               <div v-show="modalTab === 'register'" class="space-y-4">
-                <div class="p-4 bg-indigo-50/50 rounded-xl border border-indigo-100/50">
-                  <h5 class="text-sm font-semibold text-indigo-900 mb-1">Passkey 优势</h5>
-                  <p class="text-xs text-indigo-700/80 leading-relaxed">
+                <div class="p-4 bg-indigo-50/50 dark:bg-indigo-900/20 rounded-xl border border-indigo-100/50 dark:border-indigo-800/30">
+                  <h5 class="text-sm font-semibold text-indigo-900 dark:text-indigo-300 mb-1">Passkey 优势</h5>
+                  <p class="text-xs text-indigo-700/80 dark:text-indigo-300/80 leading-relaxed">
                     绑定后，您可以使用指纹、面容 ID 或 PIN 码快速登录，无需手动复制粘贴 Token。更加安全、便捷。
                   </p>
                 </div>
                 
                 <div class="space-y-1.5">
-                  <label class="block text-xs font-semibold text-gray-500 uppercase ml-1">用户名</label>
+                  <label class="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase ml-1">用户名</label>
                   <div class="relative">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <svg class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <svg class="h-5 w-5 text-gray-400 dark:text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                       </svg>
                     </div>
@@ -539,23 +539,23 @@ defineExpose({
                       v-model="form.username" 
                       type="text" 
                       placeholder="设置一个不会与他人冲突的用户名 (建议唯一且复杂)"
-                      class="block w-full pl-10 pr-3 py-2.5 border border-gray-200 rounded-xl leading-5 bg-gray-50 placeholder-gray-400 focus:outline-none focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all sm:text-sm"
+                      class="block w-full pl-10 pr-3 py-2.5 border border-gray-200 dark:border-gray-600 rounded-xl leading-5 bg-gray-50 dark:bg-gray-700 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:bg-white dark:focus:bg-gray-600 focus:ring-2 focus:ring-indigo-500/20 dark:focus:ring-indigo-500/30 focus:border-indigo-500 transition-all sm:text-sm text-gray-900 dark:text-gray-100"
                     >
                   </div>
-                  <div class="mt-2 rounded-lg border border-yellow-200 bg-yellow-50 px-3 py-2 flex items-start gap-3">
-                    <svg class="w-4 h-4 text-yellow-600 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <div class="mt-2 rounded-lg border border-yellow-200 dark:border-yellow-900/40 bg-yellow-50 dark:bg-yellow-900/20 px-3 py-2 flex items-start gap-3">
+                    <svg class="w-4 h-4 text-yellow-600 dark:text-yellow-500 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0zM12 9v4m0 4h.01" />
                     </svg>
                     <div>
-                      <p class="text-xs font-medium text-yellow-800">重要提示</p>
-                      <p class="text-xs text-yellow-800/95 leading-relaxed">请设置一个不会与他人冲突的唯一用户名。用户名仅作为存储键，不会泄露 Token 内容。</p>
+                      <p class="text-xs font-medium text-yellow-800 dark:text-yellow-400">重要提示</p>
+                      <p class="text-xs text-yellow-800/95 dark:text-yellow-300/80 leading-relaxed">请设置一个不会与他人冲突的唯一用户名。用户名仅作为存储键，不会泄露 Token 内容。</p>
                     </div>
                   </div>
                 </div>
                 
                 <div class="space-y-1.5">
-                   <label class="block text-xs font-semibold text-gray-500 uppercase ml-1">绑定 Token</label>
-                   <div class="p-3 bg-gray-50 rounded-xl border border-dashed border-gray-300 text-xs text-gray-500 flex items-center gap-2">
+                   <label class="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase ml-1">绑定 Token</label>
+                   <div class="p-3 bg-gray-50 dark:bg-gray-700 rounded-xl border border-dashed border-gray-300 dark:border-gray-600 text-xs text-gray-500 dark:text-gray-400 flex items-center gap-2">
                       <span class="flex-shrink-0 w-1.5 h-1.5 rounded-full bg-green-500"></span>
                       将使用当前填写的 API Token 进行绑定
                    </div>
@@ -564,7 +564,7 @@ defineExpose({
                 <button 
                   @click="registerPasskey"
                   :disabled="loading.register || !form.username || !currentToken"
-                  class="w-full mt-2 py-3 px-4 bg-indigo-600 text-white font-medium rounded-xl hover:bg-indigo-700 hover:shadow-lg hover:shadow-indigo-500/20 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
+                  class="w-full mt-2 py-3 px-4 bg-indigo-600 text-white font-medium rounded-xl hover:bg-indigo-700 dark:hover:bg-indigo-700 hover:shadow-lg hover:shadow-indigo-500/20 dark:hover:shadow-indigo-500/10 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-gray-800 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
                 >
                   <svg v-if="loading.register" class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -577,11 +577,11 @@ defineExpose({
               <!-- 管理标签 -->
               <div v-show="modalTab === 'manage'" class="space-y-4">
                 <div class="space-y-1.5">
-                  <label class="block text-xs font-semibold text-gray-500 uppercase ml-1">查询用户名</label>
+                  <label class="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase ml-1">查询用户名</label>
                   <div class="flex gap-2">
                     <div class="relative flex-1">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <svg class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <svg class="h-5 w-5 text-gray-400 dark:text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                             </svg>
                         </div>
@@ -589,13 +589,13 @@ defineExpose({
                             v-model="form.username" 
                             type="text" 
                             placeholder="输入用户名"
-                            class="block w-full pl-10 pr-3 py-2.5 border border-gray-200 rounded-xl leading-5 bg-gray-50 placeholder-gray-400 focus:outline-none focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all sm:text-sm"
+                            class="block w-full pl-10 pr-3 py-2.5 border border-gray-200 dark:border-gray-600 rounded-xl leading-5 bg-gray-50 dark:bg-gray-700 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:bg-white dark:focus:bg-gray-600 focus:ring-2 focus:ring-indigo-500/20 dark:focus:ring-indigo-500/30 focus:border-indigo-500 transition-all sm:text-sm text-gray-900 dark:text-gray-100"
                         >
                     </div>
                     <button 
                       @click="loadCredentials"
                       :disabled="loading.list || !form.username"
-                      class="px-4 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 rounded-xl font-medium text-sm disabled:opacity-50 transition-colors"
+                      class="px-4 py-2 bg-indigo-50 dark:bg-indigo-900/20 hover:bg-indigo-100 dark:hover:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-xl font-medium text-sm disabled:opacity-50 transition-colors"
                     >
                       <svg v-if="loading.list" class="w-5 h-5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -607,21 +607,21 @@ defineExpose({
                 
                 <!-- 凭证列表 -->
                 <div v-if="credentials.length > 0" class="space-y-2 mt-2">
-                  <p class="text-xs font-semibold text-gray-500 uppercase ml-1">已绑定的设备</p>
+                  <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase ml-1">已绑定的设备</p>
                   <div class="max-h-60 overflow-y-auto space-y-2 pr-1 custom-scrollbar">
-                      <div v-for="cred in credentials" :key="cred.id" class="bg-white border border-gray-100 shadow-sm rounded-xl overflow-hidden transition-all">
+                      <div v-for="cred in credentials" :key="cred.id" class="bg-white dark:bg-gray-700 border border-gray-100 dark:border-gray-600 shadow-sm rounded-xl overflow-hidden transition-all">
                         <div class="flex items-center justify-between p-3">
                           <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 bg-indigo-50 text-indigo-600 rounded-full flex items-center justify-center shrink-0">
+                            <div class="w-10 h-10 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 rounded-full flex items-center justify-center shrink-0">
                               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
                               </svg>
                             </div>
                             <div>
-                              <div class="text-sm font-semibold text-gray-900 flex items-center gap-1.5">
+                              <div class="text-sm font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-1.5">
                                 {{ cred.deviceType === 'multiDevice' ? '云端同步密钥' : '本地设备密钥' }}
                               </div>
-                              <div class="text-xs text-gray-400 mt-0.5 font-mono">
+                              <div class="text-xs text-gray-400 dark:text-gray-500 mt-0.5 font-mono">
                                 {{ formatDate(cred.createdAt) }}
                               </div>
                             </div>
@@ -629,7 +629,7 @@ defineExpose({
                           <button 
                             @click="showDeleteConfirm(cred.id)"
                             :disabled="loading.delete"
-                            class="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                            class="p-2 text-gray-400 dark:text-gray-500 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
                             title="删除此 Passkey"
                           >
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -647,12 +647,12 @@ defineExpose({
                           leave-from-class="max-h-40 opacity-100"
                           leave-to-class="max-h-0 opacity-0"
                         >
-                          <div v-if="deletingCredentialId === cred.id" class="border-t border-red-100 bg-red-50/50 px-4 py-3">
+                          <div v-if="deletingCredentialId === cred.id" class="border-t border-red-200 dark:border-red-900/40 bg-red-50/50 dark:bg-red-900/20 px-4 py-3">
                             <div class="flex items-start gap-2 mb-3">
-                              <svg class="w-4 h-4 text-red-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <svg class="w-4 h-4 text-red-600 dark:text-red-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                               </svg>
-                              <div class="text-xs text-red-800">
+                              <div class="text-xs text-red-800 dark:text-red-300">
                                 <p class="font-semibold">确认删除此 Passkey？</p>
                                 <p class="mt-0.5 leading-relaxed">删除后需要重新注册才能继续使用。操作需要通过 Passkey 验证身份。</p>
                               </div>
@@ -660,13 +660,13 @@ defineExpose({
                             <div class="flex gap-2">
                               <button 
                                 @click="cancelDelete"
-                                class="flex-1 py-2 px-3 bg-white text-gray-700 text-xs font-medium rounded-lg hover:bg-gray-50 border border-gray-200 transition-colors"
+                                class="flex-1 py-2 px-3 bg-white dark:bg-gray-600 text-gray-700 dark:text-gray-200 text-xs font-medium rounded-lg hover:bg-gray-50 dark:hover:bg-gray-500 border border-gray-200 dark:border-gray-500 transition-colors"
                               >
                                 取消
                               </button>
                               <button 
                                 @click="deleteCredentialById(cred.id)"
-                                class="flex-1 py-2 px-3 bg-red-600 text-white text-xs font-medium rounded-lg hover:bg-red-700 transition-colors flex items-center justify-center gap-1.5"
+                                class="flex-1 py-2 px-3 bg-red-600 text-white text-xs font-medium rounded-lg hover:bg-red-700 dark:hover:bg-red-700 transition-colors flex items-center justify-center gap-1.5"
                               >
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -680,12 +680,12 @@ defineExpose({
                   </div>
                 </div>
                 
-                <div v-else-if="form.username && !loading.list" class="flex flex-col items-center justify-center py-8 text-gray-400 bg-gray-50/50 rounded-xl border border-dashed border-gray-200">
-                  <svg class="w-12 h-12 mb-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div v-else-if="form.username && !loading.list" class="flex flex-col items-center justify-center py-8 text-gray-400 dark:text-gray-500 bg-gray-50/50 dark:bg-gray-700/30 rounded-xl border border-dashed border-gray-200 dark:border-gray-600">
+                  <svg class="w-12 h-12 mb-3 text-gray-300 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                   <p class="text-sm font-medium">暂无数据</p>
-                  <p class="text-xs text-gray-400 mt-1">未查询到该用户的 Passkey</p>
+                  <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">未查询到该用户的 Passkey</p>
                 </div>
               </div>
             </div>

@@ -20,13 +20,13 @@ watch(() => props.logs.length, () => {
 </script>
 
 <template>
-    <div class="bg-gray-900 rounded-xl shadow-inner border border-gray-800 p-4 mb-6 font-mono text-xs sm:text-sm h-64 overflow-y-auto custom-scrollbar flex flex-col" ref="logConsoleRef">
-        <div v-if="logs.length === 0" class="flex flex-col items-center justify-center h-full text-gray-400 select-none">
-            <pre class="mb-3 text-sm sm:text-base leading-tight font-mono text-gray-300 select-none text-center ascii-cat">(\_/)
+    <div class="bg-gray-900 dark:bg-gray-950 rounded-xl shadow-inner border border-gray-800 dark:border-gray-900 p-4 mb-6 font-mono text-xs sm:text-sm h-64 overflow-y-auto custom-scrollbar flex flex-col" ref="logConsoleRef">
+        <div v-if="logs.length === 0" class="flex flex-col items-center justify-center h-full text-gray-400 dark:text-gray-500 select-none">
+            <pre class="mb-3 text-sm sm:text-base leading-tight font-mono text-gray-300 dark:text-gray-400 select-none text-center ascii-cat">(\_/)
 ( <span class="eye">o</span>.<span class="eye">o</span> )
 /> <\</pre>
             <span class="animate-pulse mb-2">...等待任务启动，好奇地等待中...</span>
-            <a href="https://afdian.com/a/mintimate" target="_blank" class="text-xs text-purple-200 hover:text-purple-400 transition-colors mt-1">
+            <a href="https://afdian.com/a/mintimate" target="_blank" class="text-xs text-purple-200 dark:text-purple-300 hover:text-purple-400 dark:hover:text-purple-200 transition-colors mt-1">
                 ⚡ 支持一下 (爱发电) ⚡
             </a>
         </div>
