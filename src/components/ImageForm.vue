@@ -17,7 +17,8 @@ const form = reactive({
     size: '', 
     prompt: '',
     files: [],
-    imageUrl: '' 
+    imageUrl: '',
+    apiVersion: 'tuzi' // 'tuzi' | 'official'
 });
 
 const fileInput = ref(null);
@@ -56,8 +57,15 @@ const handleSubmit = async () => {
             const maskBlob = await maskEditorRef.value.getMaskBlob();
             if (maskBlob) {
                 const maskFile = new File([maskBlob], 'mask.png', { type: 'image/png' });
-                // 局部覆写模式下，files 存放底图和蒙版，均作为 input_reference 上传
-                submitData.files = [inpaintingFile.value, maskFile];
+                
+                if (form.apiVersion === 'official') {
+                    // 官方接口：底图在 files (input_reference)，蒙版在 mask
+                    submitData.files = [inpaintingFile.value];
+                    submitData.mask = maskFile;
+                } else {
+                    // 兔子接口：底图和蒙版都在 files (input_reference)
+                    submitData.files = [inpaintingFile.value, maskFile];
+                }
             } else {
                 // 如果获取蒙版失败，至少上传底图
                 submitData.files = [inpaintingFile.value];
@@ -113,6 +121,30 @@ const handleSubmit = async () => {
                 <option value="gemini-3-pro-image-preview-4k-async">Gemini 3 Pro x Nano Banana 2 (4k)</option>
             </select>
             <p class="mt-1 text-xs text-gray-400 dark:text-gray-500">实际值: {{ form.model }}</p>
+        </div>
+
+        <!-- 接口版本选择 (仅 Inpainting 模式) -->
+        <div v-if="mode === 'inpainting'">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 flex items-center">
+                接口版本
+                <div class="relative group ml-2">
+                    <svg class="w-4 h-4 text-gray-400 cursor-help" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <div class="absolute left-0 bottom-full mb-2 hidden group-hover:block w-64 p-2 bg-gray-800 text-white text-xs rounded shadow-lg z-10">
+                        <p class="mb-1"><strong>官方版本：</strong>使用 mask 字段上传蒙版。</p>
+                        <p><strong>兔子版本：</strong>使用 input_reference 字段上传蒙版（非标）。</p>
+                    </div>
+                </div>
+            </label>
+            <div class="flex space-x-4 mt-1">
+                <label class="inline-flex items-center cursor-pointer">
+                    <input type="radio" v-model="form.apiVersion" value="tuzi" class="form-radio text-indigo-600 focus:ring-indigo-500 h-4 w-4">
+                    <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">兔子接口 (非标)</span>
+                </label>
+                <label class="inline-flex items-center cursor-pointer">
+                    <input type="radio" v-model="form.apiVersion" value="official" class="form-radio text-indigo-600 focus:ring-indigo-500 h-4 w-4">
+                    <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">官方接口 (标准)</span>
+                </label>
+            </div>
         </div>
 
         <div v-if="mode === 'generate'">
