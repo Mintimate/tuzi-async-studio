@@ -1,6 +1,6 @@
 <script setup>
 import axios from 'axios';
-import { onMounted, onUnmounted, reactive, ref, watch } from 'vue';
+import { nextTick, onMounted, onUnmounted, reactive, ref, watch } from 'vue';
 import ImageForm from './components/ImageForm.vue';
 import LogConsole from './components/LogConsole.vue';
 import PasskeyManager from './components/PasskeyManager.vue';
@@ -21,6 +21,43 @@ const applyTheme = () => {
     } else {
         document.documentElement.classList.remove('dark');
     }
+};
+
+const toggleTheme = (mode, event) => {
+    // 如果不支持 View Transitions 或没有事件对象，直接切换
+    if (!document.startViewTransition || !event) {
+        themeMode.value = mode;
+        return;
+    }
+
+    const x = event.clientX;
+    const y = event.clientY;
+    const endRadius = Math.hypot(
+        Math.max(x, window.innerWidth - x),
+        Math.max(y, window.innerHeight - y)
+    );
+
+    const transition = document.startViewTransition(async () => {
+        themeMode.value = mode;
+        await nextTick();
+    });
+
+    transition.ready.then(() => {
+        const clipPath = [
+            `circle(0px at ${x}px ${y}px)`,
+            `circle(${endRadius}px at ${x}px ${y}px)`
+        ];
+        document.documentElement.animate(
+            {
+                clipPath: clipPath,
+            },
+            {
+                duration: 500,
+                easing: 'ease-in',
+                pseudoElement: '::view-transition-new(root)',
+            }
+        );
+    });
 };
 
 // 监听系统主题变化
@@ -337,21 +374,21 @@ const queryTask = async () => {
                     <!-- Theme Selector -->
                     <div class="flex items-center p-1 bg-gray-200 dark:bg-gray-700 rounded-lg transition-colors border border-gray-300 dark:border-gray-600">
                         <button 
-                            @click="themeMode = 'light'" 
+                            @click="toggleTheme('light', $event)" 
                             :class="themeMode === 'light' ? 'bg-white dark:bg-gray-600 shadow-sm text-indigo-600 dark:text-indigo-400' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'"
                             class="p-1.5 rounded-md transition-all duration-200" 
                             title="浅色模式">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 9h-1m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
                         </button>
                         <button 
-                            @click="themeMode = 'auto'" 
+                            @click="toggleTheme('auto', $event)" 
                             :class="themeMode === 'auto' ? 'bg-white dark:bg-gray-600 shadow-sm text-indigo-600 dark:text-indigo-400' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'"
                             class="p-1.5 rounded-md transition-all duration-200" 
                             title="跟随系统">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
                         </button>
                         <button 
-                            @click="themeMode = 'dark'" 
+                            @click="toggleTheme('dark', $event)" 
                             :class="themeMode === 'dark' ? 'bg-white dark:bg-gray-600 shadow-sm text-indigo-600 dark:text-indigo-400' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'"
                             class="p-1.5 rounded-md transition-all duration-200" 
                             title="深色模式">
@@ -560,3 +597,11 @@ const queryTask = async () => {
         </div>
     </div>
 </template>
+
+<style>
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+</style>
