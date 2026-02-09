@@ -187,6 +187,7 @@ export default {
   },
   resultDisplay: {
     processing: 'Processing...',
+    failed: 'Task Failed',
     placeholder: 'Generation result will be displayed here',
     modeImage: 'Mode: Image Generation',
     modeVideo: 'Mode: Video Generation'

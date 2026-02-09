@@ -187,6 +187,7 @@ export default {
   },
   resultDisplay: {
     processing: '处理中...',
+    failed: '任务执行失败',
     placeholder: '生成结果将在此显示',
     modeImage: '模式: 图像生成',
     modeVideo: '模式: 视频生成'

@@ -59,6 +59,23 @@ const isVideo = computed(() => {
                 </a>
             </div>
         </template>
+
+        <template v-else-if="result && result.status === 'failed'">
+            <div class="flex flex-col items-center justify-center text-center p-6">
+                <div class="w-16 h-16 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mb-4">
+                    <svg class="w-8 h-8 text-red-500 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </div>
+                <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">{{ t('resultDisplay.failed') }}</h3>
+                <p class="text-sm text-gray-500 dark:text-gray-400 max-w-xs break-words">
+                    {{ result.error?.message || result.error || 'Unknown error' }}
+                </p>
+                <p v-if="result.error?.code" class="text-xs text-gray-400 mt-2 font-mono">
+                    Code: {{ result.error.code }}
+                </p>
+            </div>
+        </template>
         
         <template v-else-if="loading">
             <div class="flex flex-col items-center justify-center">
