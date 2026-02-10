@@ -17,7 +17,7 @@ const maskEditorRef = ref(null);
 const inpaintingFile = ref(null);
 
 const form = reactive({
-    model: 'gemini-3-pro-image-preview-4k-async',
+    model: 'gemini-3-pro-image-preview-2k-async',
     size: '', 
     prompt: '',
     files: [],
