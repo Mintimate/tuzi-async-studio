@@ -16,7 +16,13 @@ export default {
     showToken: 'Show/Hide Token',
     autoFilled: 'URL Token Auto-filled',
     register: 'Get Token (Invite Code: SJ33)',
-    docs: 'API Documentation'
+    docs: 'API Documentation',
+    retryCount: 'Retry Count',
+    retryCountDesc: 'Max retries when queue stalls',
+    retryCountHelp: 'System will automatically resubmit task when server returns queue full or stall error. This sets max attempts before giving up. 3-5 times is recommended.',
+    retryDelay: 'Retry Delay (ms)',
+    retryDelayDesc: 'Wait time between retries',
+    retryDelayHelp: 'Wait time between each retry attempt. Appropriate delay (e.g. 2000ms) gives server time to process backlog and improves success rate.'
   },
   tabs: {
     image: 'Image Gen',
@@ -54,7 +60,10 @@ export default {
     manualQuery: 'Manual Query Task: {id}',
     querySuccess: 'Query Success: {icon} {label} ({status})',
     queryFail: 'Query Failed: {message}',
-    submitFail: 'Task Submit Failed: {message}'
+    submitFail: 'Task Submit Failed: {message}',
+    retry: 'Queue stall detected, retrying {count}/{max}...',
+    retryConfig: 'Retry config: Max {max} times, interval {delay}s',
+    retrySuccess: 'Retry successful! Task submitted after {attempt} attempt(s)'
   },
   footer: {
     github: 'GitHub Source',

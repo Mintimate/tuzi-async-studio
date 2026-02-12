@@ -16,7 +16,13 @@ export default {
     showToken: '显示/隐藏 Token',
     autoFilled: '已自动填充 URL Token',
     register: '注册获取 Token (邀请码: SJ33)',
-    docs: '查看 API 接口文档'
+    docs: '查看 API 接口文档',
+    retryCount: '重试次数',
+    retryCountDesc: '队列假死时的最大重试次数',
+    retryCountHelp: '当服务器返回队列已满或假死错误时，系统会自动重新提交任务。此设置决定了放弃前的最大尝试次数。通常设置为 3-5 次即可。',
+    retryDelay: '重试间隔 (ms)',
+    retryDelayDesc: '每次重试之间的等待时间',
+    retryDelayHelp: '每次重试尝试之间的等待时间。适当的延迟（如 2000ms）可以让服务器有时间处理积压的任务，提高重试成功率。'
   },
   tabs: {
     image: '图像生成',
@@ -54,7 +60,10 @@ export default {
     manualQuery: '手动查询任务: {id}',
     querySuccess: '查询成功: {icon} {label} ({status})',
     queryFail: '查询失败: {message}',
-    submitFail: '任务提交失败: {message}'
+    submitFail: '任务提交失败: {message}',
+    retry: '检测到队列假死，正在进行第 {count}/{max} 次自动重试...',
+    retryConfig: '重试配置: 最多 {max} 次，间隔 {delay} 秒',
+    retrySuccess: '重试成功！经过 {attempt} 次尝试后任务提交成功'
   },
   footer: {
     github: 'GitHub 源码',

@@ -9,6 +9,7 @@ import ResultDisplay from './components/ResultDisplay.vue';
 import SiteStats from './components/SiteStats.vue';
 import UsageGuide from './components/UsageGuide.vue';
 import VideoForm from './components/VideoForm.vue';
+import Wwads from './components/Wwads.vue';
 
 const { t, locale } = useI18n();
 
@@ -88,7 +89,9 @@ if (urlToken && persistToken.value) {
 
 const config = reactive({
     baseUrl: localStorage.getItem('tuzi_api_base_url') || 'https://api.tu-zi.com',
-    token: urlToken || (persistToken.value ? (localStorage.getItem('tuzi_api_token') || '') : '')
+    token: urlToken || (persistToken.value ? (localStorage.getItem('tuzi_api_token') || '') : ''),
+    retryCount: parseInt(localStorage.getItem('tuzi_retry_count') || '5'),
+    retryDelay: parseInt(localStorage.getItem('tuzi_retry_delay') || '2000')
 });
 
 // Token visibility
@@ -163,6 +166,10 @@ watch(() => config.token, (val) => {
         localStorage.setItem('tuzi_api_token', val);
     }
 });
+
+watch(() => config.retryCount, (val) => localStorage.setItem('tuzi_retry_count', val.toString()));
+
+watch(() => config.retryDelay, (val) => localStorage.setItem('tuzi_retry_delay', val.toString()));
 
 watch(persistToken, (val) => {
     localStorage.setItem('tuzi_persist_token', val);
@@ -241,12 +248,68 @@ const submitTask = async (formDataObj) => {
 
         addLog(t('logs.submitting'), 'info');
 
-        const response = await axios.post(`${config.baseUrl.replace(/\/$/, '')}/v1/videos`, formData, {
-            headers: {
-                'Authorization': `Bearer ${config.token}`,
-                'Content-Type': 'multipart/form-data'
+        let retryAttempt = 0;
+        const maxRetries = config.retryCount;
+        const retryDelayMs = config.retryDelay;
+        let response;
+
+        addLog(t('logs.retryConfig', { max: maxRetries, delay: retryDelayMs / 1000 }), 'info');
+
+        while (true) {
+            try {
+                response = await axios.post(`${config.baseUrl.replace(/\/$/, '')}/v1/videos`, formData, {
+                    headers: {
+                        'Authorization': `Bearer ${config.token}`,
+                        'Content-Type': 'multipart/form-data'
+                    }
+                });
+
+                const data = response.data;
+                // 检查是否是假成功（HTTP 200 但业务失败）
+                // 错误特征：ID 是 UUID (包含 '-')，或者有 error 字段，或者 status 是 failed
+                // 正确特征：ID 是数字字符串
+                const isNumericId = /^\d+$/.test(data.id);
+                const hasError = data.error || data.status === 'failed';
+
+                if (isNumericId && !hasError) {
+                    if (retryAttempt > 0) {
+                        addLog(t('logs.retrySuccess', { attempt: retryAttempt }), 'success');
+                    }
+                    break; // 成功，跳出循环
+                } else {
+                    // 检查是否是特定错误
+                    if (data.error?.code === '2400013' || (data.error?.message && data.error.message.includes('当前已有多个任务在队列中'))) {
+                         throw new Error('QueueFullError'); 
+                    }
+                    
+                    // 如果 ID 不是数字，也可能是错误的一种表现
+                    if (!isNumericId) {
+                         if (JSON.stringify(data).includes('当前已有多个任务在队列中') || JSON.stringify(data).includes('2400013')) {
+                             throw new Error('QueueFullError');
+                         }
+                    }
+                    
+                    // 其他情况，视为普通失败，不重试
+                    break;
+                }
+            } catch (err) {
+                const isQueueError = err.message === 'QueueFullError';
+                const responseData = err.response?.data;
+                const isApiQueueError = responseData && (
+                    responseData.error?.code === '2400013' || 
+                    (responseData.error?.message && responseData.error.message.includes('当前已有多个任务在队列中')) ||
+                    JSON.stringify(responseData).includes('2400013')
+                );
+
+                if ((isQueueError || isApiQueueError) && retryAttempt < maxRetries) {
+                    retryAttempt++;
+                    addLog(t('logs.retry', { count: retryAttempt, max: maxRetries }), 'warning');
+                    await new Promise(resolve => setTimeout(resolve, retryDelayMs));
+                    continue;
+                }
+                throw err;
             }
-        });
+        }
 
         submitResult.value = response.data;
         addLog(t('logs.submitSuccess', { id: response.data.id }), 'success');
@@ -430,8 +493,8 @@ const queryTask = async () => {
                 <div class="lg:col-span-1 space-y-6">
                     
                     <!-- Global Config Card -->
-                    <div class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden transition-all duration-300 hover:shadow-md">
-                        <div class="bg-gray-50/50 dark:bg-gray-700/50 px-6 py-4 border-b border-gray-100 dark:border-gray-600">
+                    <div class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 transition-all duration-300 hover:shadow-md">
+                        <div class="bg-gray-50/50 dark:bg-gray-700/50 px-6 py-4 border-b border-gray-100 dark:border-gray-600 rounded-t-2xl">
                             <h2 class="text-sm font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-wider">
                                 ⚙️ {{ t('config.title') }}
                             </h2>
@@ -440,6 +503,34 @@ const queryTask = async () => {
                             <div>
                                 <label class="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase mb-1">{{ t('config.baseUrl') }}</label>
                                 <input v-model="config.baseUrl" type="text" placeholder="https://api.tu-zi.com" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                            </div>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <div class="flex items-center gap-1 mb-1">
+                                        <label class="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">{{ t('config.retryCount') }}</label>
+                                        <div class="tooltip-wrapper relative">
+                                            <svg class="w-3.5 h-3.5 text-gray-400 cursor-help hover:text-indigo-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                            <div class="tooltip-content">{{ t('config.retryCountHelp') }}</div>
+                                        </div>
+                                    </div>
+                                    <input v-model.number="config.retryCount" type="number" min="0" max="20" placeholder="5" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                                    <p class="mt-1 text-xs text-gray-400 dark:text-gray-500">{{ t('config.retryCountDesc') }}</p>
+                                </div>
+                                <div>
+                                    <div class="flex items-center gap-1 mb-1">
+                                        <label class="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">{{ t('config.retryDelay') }}</label>
+                                        <div class="tooltip-wrapper relative">
+                                            <svg class="w-3.5 h-3.5 text-gray-400 cursor-help hover:text-indigo-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                            <div class="tooltip-content">{{ t('config.retryDelayHelp') }}</div>
+                                        </div>
+                                    </div>
+                                    <input v-model.number="config.retryDelay" type="number" min="500" max="10000" step="500" placeholder="2000" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                                    <p class="mt-1 text-xs text-gray-400 dark:text-gray-500">{{ t('config.retryDelayDesc') }}</p>
+                                </div>
                             </div>
                             <div>
                                 <label class="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase mb-1">{{ t('config.token') }}</label>
@@ -593,9 +684,11 @@ const queryTask = async () => {
 
                     </div>
                     
+                    <!-- Sponsor Ad -->
+                    <Wwads :horizontal="true" />
                 </div>
             </div>
-            
+
             <!-- Footer -->
             <footer class="mt-12 text-center border-t border-gray-200 dark:border-gray-700 pt-8 pb-8">
                 <!-- Site Stats Component -->
@@ -643,5 +736,57 @@ const queryTask = async () => {
 }
 .animation-delay-4000 {
   animation-delay: 4s;
+}
+
+/* Tooltip Styles */
+.tooltip-wrapper {
+  display: inline-block;
+}
+
+.tooltip-wrapper .tooltip-content {
+  visibility: hidden;
+  opacity: 0;
+  position: absolute;
+  z-index: 1000;
+  bottom: 125%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(55, 65, 81, 0.95);
+  color: #fff;
+  text-align: left;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  line-height: 1.4;
+  white-space: normal;
+  width: 280px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  transition: opacity 0.2s, visibility 0.2s;
+  pointer-events: none;
+}
+
+.dark .tooltip-wrapper .tooltip-content {
+  background-color: rgba(31, 41, 55, 0.95);
+  border: 1px solid rgba(75, 85, 99, 0.5);
+}
+
+.tooltip-wrapper .tooltip-content::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: rgba(55, 65, 81, 0.95) transparent transparent transparent;
+}
+
+.dark .tooltip-wrapper .tooltip-content::after {
+  border-color: rgba(31, 41, 55, 0.95) transparent transparent transparent;
+}
+
+.tooltip-wrapper:hover .tooltip-content {
+  visibility: visible;
+  opacity: 1;
 }
 </style>
