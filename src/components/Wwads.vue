@@ -51,6 +51,14 @@ onMounted(() => {
   padding: 16px;
 }
 
+:deep(.wwads-cn):empty {
+  padding: 0;
+  border: none;
+  background-color: transparent !important;
+  box-shadow: none;
+  backdrop-filter: none;
+}
+
 :deep(.wwads-text) {
   color: var(--wwads-text-color, #374151) !important;
 }

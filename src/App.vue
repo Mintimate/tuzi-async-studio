@@ -578,6 +578,9 @@ const queryTask = async () => {
                         </div>
                     </div>
 
+                    <!-- Sponsor Ad -->
+                    <Wwads :horizontal="true" />
+
                     <!-- Create Task Card -->
                     <div class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl shadow-xl shadow-indigo-100/50 dark:shadow-indigo-900/30 border border-gray-100 dark:border-gray-700 overflow-hidden transition-all duration-300 hover:shadow-2xl hover:shadow-indigo-200/50 dark:hover:shadow-indigo-900/50">
                         <!-- Tabs -->
@@ -683,9 +686,6 @@ const queryTask = async () => {
                          </div>
 
                     </div>
-                    
-                    <!-- Sponsor Ad -->
-                    <Wwads :horizontal="true" />
                 </div>
             </div>
 
