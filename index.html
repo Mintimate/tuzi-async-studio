@@ -21,6 +21,18 @@
     <link rel="apple-touch-icon" href="/favicon.png" />
     <link rel="manifest" href="/site.webmanifest" />
     
+    <!-- Prevent Dark Mode Flash -->
+    <script>
+      (function() {
+        const themeMode = localStorage.getItem('tuzi_theme_mode') || 'auto';
+        const isDark = themeMode === 'dark' || 
+                      (themeMode === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+        if (isDark) {
+          document.documentElement.classList.add('dark');
+        }
+      })();
+    </script>
+    
     <!-- Open Graph Meta Tags -->
     <meta property="og:title" content="Tuzi 智绘工坊 - 高性能 AI 创作平台" />
     <meta property="og:description" content="封装 Tuzi API 异步接口，提供“二段跳”式的高效生图与视频创作体验" />
