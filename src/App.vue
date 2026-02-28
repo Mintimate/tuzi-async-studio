@@ -91,7 +91,8 @@ const config = reactive({
     baseUrl: localStorage.getItem('tuzi_api_base_url') || 'https://api.tu-zi.com',
     token: urlToken || (persistToken.value ? (localStorage.getItem('tuzi_api_token') || '') : ''),
     retryCount: parseInt(localStorage.getItem('tuzi_retry_count') || '5'),
-    retryDelay: parseInt(localStorage.getItem('tuzi_retry_delay') || '2000')
+    retryDelay: parseInt(localStorage.getItem('tuzi_retry_delay') || '2000'),
+    isSync: localStorage.getItem('tuzi_is_sync') === 'true'
 });
 
 // Token visibility
@@ -171,6 +172,8 @@ watch(() => config.retryCount, (val) => localStorage.setItem('tuzi_retry_count',
 
 watch(() => config.retryDelay, (val) => localStorage.setItem('tuzi_retry_delay', val.toString()));
 
+watch(() => config.isSync, (val) => localStorage.setItem('tuzi_is_sync', val));
+
 watch(persistToken, (val) => {
     localStorage.setItem('tuzi_persist_token', val);
     if (val) {
@@ -202,7 +205,10 @@ const queryTaskId = ref('');
 const queryResult = ref(null);
 
 // Reset state when switching tabs
-watch(activeTab, () => {
+watch(activeTab, (newVal) => {
+    if (newVal === 'video') {
+        config.isSync = false;
+    }
     submitResult.value = null;
     queryResult.value = null;
     // queryTaskId.value = '';
@@ -219,6 +225,56 @@ const submitTask = async (formDataObj) => {
     addLog(t('logs.startTask', { model: formDataObj.model }), 'info');
 
     try {
+        if (config.isSync && activeTab.value === 'image') {
+             const url = `${config.baseUrl.replace(/\/$/, '')}/v1/images/generations`;
+             addLog(`Sync Mode: POST ${url}`, 'info');
+             
+             const payload = {
+                 model: formDataObj.model,
+                 prompt: formDataObj.prompt,
+                 n: 1,
+                 size: formDataObj.size || "1024x1024",
+                 // response_format: "url"
+             };
+
+             addLog(t('logs.submitting'), 'info');
+             
+             const response = await axios.post(url, payload, {
+                 headers: {
+                     'Authorization': `Bearer ${config.token}`,
+                     'Content-Type': 'application/json'
+                 }
+             });
+             
+             const data = response.data;
+             if (data.data && data.data.length > 0) {
+                 let resultUrl = data.data[0].url;
+                 
+                 // Handle b64_json
+                 if (!resultUrl && data.data[0].b64_json) {
+                     resultUrl = `data:image/png;base64,${data.data[0].b64_json}`;
+                 }
+
+                 if (!resultUrl) {
+                     throw new Error('No image URL or Base64 data returned');
+                 }
+
+                 const result = {
+                     status: 'completed',
+                     video_url: resultUrl,
+                     created_at: new Date().toISOString(),
+                     object: 'image'
+                 };
+                 submitResult.value = result;
+                 queryResult.value = result;
+                 addLog(t('logs.submitSuccess', { id: 'sync-task' }), 'success');
+                 addLog(t('logs.taskCompleted', { icon: '✅' }), 'success');
+             } else {
+                 throw new Error('No image data returned from API');
+             }
+             return;
+        }
+
         const formData = new FormData();
         formData.append('model', formDataObj.model);
         formData.append('prompt', formDataObj.prompt);
@@ -504,6 +560,30 @@ const queryTask = async () => {
                                 <label class="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase mb-1">{{ t('config.baseUrl') }}</label>
                                 <input v-model="config.baseUrl" type="text" placeholder="https://api.tu-zi.com" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                             </div>
+                            
+                            <div class="flex items-center justify-between py-1 border-b border-gray-100 dark:border-gray-700 pb-3 mb-1">
+                                <div class="flex flex-col">
+                                    <span class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Sync Mode / 同步模式</span>
+                                    <span class="text-[10px] text-gray-400 dark:text-gray-500">{{ config.isSync ? 'Use /v1/images/generations' : 'Use /v1/videos (Async)' }}</span>
+                                </div>
+                                <button 
+                                    @click="config.isSync = !config.isSync" 
+                                    :disabled="activeTab === 'video'"
+                                    :class="[
+                                        config.isSync ? 'bg-indigo-600' : 'bg-gray-200 dark:bg-gray-600',
+                                        activeTab === 'video' ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
+                                    ]"
+                                    class="relative inline-flex h-6 w-11 flex-shrink-0 rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2" 
+                                    role="switch" 
+                                    :aria-checked="config.isSync">
+                                    <span 
+                                        aria-hidden="true" 
+                                        :class="config.isSync ? 'translate-x-5' : 'translate-x-0'" 
+                                        class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out">
+                                    </span>
+                                </button>
+                            </div>
+
                             <div class="grid grid-cols-2 gap-3">
                                 <div>
                                     <div class="flex items-center gap-1 mb-1">
@@ -606,6 +686,7 @@ const queryTask = async () => {
                             <ImageForm 
                                 :loading="loading.submit" 
                                 :isActive="activeTab === 'image'"
+                                :isSync="config.isSync"
                                 @submit="submitTask" 
                                 @log="({content, type}) => addLog(content, type)"
                             />

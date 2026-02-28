@@ -1,13 +1,15 @@
 <script setup>
 import { onMounted, onUnmounted, reactive, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { ASYNC_MODELS, SYNC_MODELS } from '../constants/models.js';
 import MaskEditor from './MaskEditor.vue';
 
 const { t } = useI18n();
 
 const props = defineProps({
     loading: Boolean,
-    isActive: Boolean
+    isActive: Boolean,
+    isSync: Boolean
 });
 
 const emit = defineEmits(['submit', 'log']);
@@ -17,12 +19,20 @@ const maskEditorRef = ref(null);
 const inpaintingFile = ref(null);
 
 const form = reactive({
-    model: 'gemini-3-pro-image-preview-2k-async',
+    model: props.isSync ? SYNC_MODELS[0].value : ASYNC_MODELS[0].value,
     size: '', 
     prompt: '',
     files: [],
     imageUrl: '',
     apiVersion: 'tuzi' // 'tuzi' | 'official'
+});
+
+watch(() => props.isSync, (newVal) => {
+    const models = newVal ? SYNC_MODELS : ASYNC_MODELS;
+    // 如果当前模型不在新列表中，则切换到第一个
+    if (!models.some(m => m.value === form.model)) {
+        form.model = models[0].value;
+    }
 });
 
 const fileInput = ref(null);
@@ -182,11 +192,16 @@ const handleSubmit = async () => {
 
         <div>
             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ t('imageForm.model') }}</label>
-            <select v-model="form.model" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md border bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-                <option value="gemini-3-pro-image-preview-async">Gemini 3 Pro x Nano Banana 2(1k)</option>
-                <option value="gemini-3-pro-image-preview-2k-async">Gemini 3 Pro x Nano Banana 2 (2k)</option>
-                <option value="gemini-3-pro-image-preview-4k-async">Gemini 3 Pro x Nano Banana 2 (4k)</option>
-            </select>
+            <div class="relative">
+                <select v-model="form.model" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 dark:border-gray-600 rounded-md py-2 px-3 border bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                    <template v-if="isSync">
+                        <option v-for="m in SYNC_MODELS" :key="m.value" :value="m.value">{{ m.label }}</option>
+                    </template>
+                    <template v-else>
+                        <option v-for="m in ASYNC_MODELS" :key="m.value" :value="m.value">{{ m.label }}</option>
+                    </template>
+                </select>
+            </div>
             <p class="mt-1 text-xs text-gray-400 dark:text-gray-500">{{ t('imageForm.actualValue', { value: form.model }) }}</p>
         </div>
 
