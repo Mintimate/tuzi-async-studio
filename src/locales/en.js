@@ -189,6 +189,7 @@ export default {
       desc: 'Auto polling or manual query'
     },
     shortcut: 'Direct query with existing Task ID',
+    sync: 'Sync model no polling needed',
     tip: {
       title: 'Tip',
       content: 'If this is your first time, please fill in a valid Token in the "Global Config" on the left. If you have a Task ID, you can directly enter it in the upper right corner to query.'

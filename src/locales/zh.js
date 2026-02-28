@@ -189,6 +189,7 @@ export default {
       desc: '自动轮询 或 手动查询'
     },
     shortcut: '已有任务 ID 可直接查询',
+    sync: '同步模型无需轮询',
     tip: {
       title: '提示',
       content: '如果是首次使用，请先在左侧"全局配置"中填入有效的 Token。已有「任务 ID 」可直接在右上角输入查询。'

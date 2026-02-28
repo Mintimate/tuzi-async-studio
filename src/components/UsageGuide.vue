@@ -18,6 +18,12 @@ const { t } = useI18n();
         {{ t('usageGuide.shortcut') }}
       </div>
 
+      <!-- Sync Call Path -->
+      <div class="hidden md:block absolute -top-8 left-[62.5%] w-[25%] h-10 border-t-2 border-x-2 border-dashed border-indigo-200 dark:border-indigo-800 rounded-t-3xl z-0 pointer-events-none"></div>
+      <div class="hidden md:block absolute -top-11 left-[75%] transform -translate-x-1/2 bg-gray-50 dark:bg-gray-900 px-2 py-0.5 text-[10px] text-indigo-500 dark:text-indigo-400 z-10 whitespace-nowrap border border-indigo-100 dark:border-indigo-900/50 rounded-full">
+        {{ t('usageGuide.sync') }}
+      </div>
+
       <div class="grid grid-cols-1 md:grid-cols-4 gap-6 relative z-10">
         <!-- Step 1: Preparation (Auth & Passkey) -->
         <div class="flex flex-col items-center text-center group">
