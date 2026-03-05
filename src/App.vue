@@ -342,6 +342,7 @@ const submitTask = async (formDataObj) => {
 
                  const result = {
                      status: 'completed',
+                     progress: 100,
                      video_url: resultUrl,
                      created_at: new Date().toISOString(),
                      object: 'image'
