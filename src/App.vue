@@ -226,15 +226,58 @@ const submitTask = async (formDataObj) => {
 
     try {
         if (config.isSync && activeTab.value === 'image') {
-             const url = `${config.baseUrl.replace(/\/$/, '')}/v1/images/generations`;
+             const url = `${config.baseUrl.replace(/\/$/, '')}/v1/chat/completions`;
              addLog(`Sync Mode: POST ${url}`, 'info');
-             
+
+             // 构建 messages 内容
+             const contentParts = [];
+
+             // 处理附件：文件转 base64
+             if (formDataObj.files && formDataObj.files.length > 0) {
+                 for (const file of formDataObj.files) {
+                     addLog(t('logs.addRefImage', { name: file.name }), 'info');
+                     const base64 = await new Promise((resolve, reject) => {
+                         const reader = new FileReader();
+                         reader.onload = () => resolve(reader.result);
+                         reader.onerror = reject;
+                         reader.readAsDataURL(file);
+                     });
+                     contentParts.push({
+                         type: 'image_url',
+                         image_url: { url: base64 }
+                     });
+                 }
+             } else if (formDataObj.imageUrl) {
+                 // 处理附件：URL 直接传入
+                 const urls = formDataObj.imageUrl.split(/[\n,\s]+/).map(u => u.trim()).filter(u => u);
+                 urls.forEach(imgUrl => {
+                     addLog(t('logs.addRefUrl', { url: imgUrl }), 'info');
+                     contentParts.push({
+                         type: 'image_url',
+                         image_url: { url: imgUrl }
+                     });
+                 });
+             }
+
+             // 添加文本 prompt
+             let promptText = formDataObj.prompt;
+             if (formDataObj.size) {
+                 promptText += `\n图片尺寸比例: ${formDataObj.size}`;
+             }
+             contentParts.push({
+                 type: 'text',
+                 text: promptText
+             });
+
              const payload = {
                  model: formDataObj.model,
-                 prompt: formDataObj.prompt,
-                 n: 1,
-                 size: formDataObj.size || "1024x1024",
-                 // response_format: "url"
+                 stream: false,
+                 messages: [
+                     {
+                         role: 'user',
+                         content: contentParts
+                     }
+                 ]
              };
 
              addLog(t('logs.submitting'), 'info');
@@ -247,16 +290,54 @@ const submitTask = async (formDataObj) => {
              });
              
              const data = response.data;
-             if (data.data && data.data.length > 0) {
-                 let resultUrl = data.data[0].url;
-                 
-                 // Handle b64_json
-                 if (!resultUrl && data.data[0].b64_json) {
-                     resultUrl = `data:image/png;base64,${data.data[0].b64_json}`;
+             if (data.choices && data.choices.length > 0) {
+                 const message = data.choices[0].message;
+                 let resultUrl = null;
+
+                 // 解析 content，可能是字符串或数组
+                 if (typeof message.content === 'string') {
+                     // 尝试从文本中提取图片 URL（markdown 格式或纯 URL）
+                     const mdMatch = message.content.match(/!\[.*?\]\((https?:\/\/[^)]+)\)/);
+                     const urlMatch = message.content.match(/(https?:\/\/[^\s]+\.(?:png|jpg|jpeg|gif|webp|bmp)[^\s]*)/);
+                     if (mdMatch) {
+                         resultUrl = mdMatch[1];
+                     } else if (urlMatch) {
+                         resultUrl = urlMatch[1];
+                     }
+
+                     // 如果是 base64 内联图片
+                     const b64Match = message.content.match(/(data:image\/[^;]+;base64,[^\s"')]+)/);
+                     if (!resultUrl && b64Match) {
+                         resultUrl = b64Match[1];
+                     }
+                     
+                     // 如果还是没找到，可能整个 content 就是 url
+                     if (!resultUrl && message.content.startsWith('http')) {
+                         resultUrl = message.content.trim();
+                     }
+                 } else if (Array.isArray(message.content)) {
+                     // content 是数组格式，遍历找图片
+                     for (const part of message.content) {
+                         if (part.type === 'image_url' && part.image_url?.url) {
+                             resultUrl = part.image_url.url;
+                             break;
+                         }
+                     }
+                     // 如果数组中没有 image_url，尝试从 text 部分提取
+                     if (!resultUrl) {
+                         for (const part of message.content) {
+                             if (part.type === 'text' && part.text) {
+                                 const mdMatch = part.text.match(/!\[.*?\]\((https?:\/\/[^)]+)\)/);
+                                 const urlMatch = part.text.match(/(https?:\/\/[^\s]+\.(?:png|jpg|jpeg|gif|webp|bmp)[^\s]*)/);
+                                 if (mdMatch) { resultUrl = mdMatch[1]; break; }
+                                 if (urlMatch) { resultUrl = urlMatch[1]; break; }
+                             }
+                         }
+                     }
                  }
 
                  if (!resultUrl) {
-                     throw new Error('No image URL or Base64 data returned');
+                     throw new Error('No image URL found in chat response');
                  }
 
                  const result = {
@@ -267,10 +348,10 @@ const submitTask = async (formDataObj) => {
                  };
                  submitResult.value = result;
                  queryResult.value = result;
-                 addLog(t('logs.submitSuccess', { id: 'sync-task' }), 'success');
+                 addLog(t('logs.submitSuccess', { id: data.id || 'sync-task' }), 'success');
                  addLog(t('logs.taskCompleted', { icon: '✅' }), 'success');
              } else {
-                 throw new Error('No image data returned from API');
+                 throw new Error('No choices returned from chat API');
              }
              return;
         }
@@ -572,7 +653,7 @@ const queryTask = async () => {
                             <div class="flex items-center justify-between py-1 border-b border-gray-100 dark:border-gray-700 pb-3 mb-1">
                                 <div class="flex flex-col">
                                     <span class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Sync Mode / 同步模式</span>
-                                    <span class="text-[10px] text-gray-400 dark:text-gray-500">{{ config.isSync ? 'Use /v1/images/generations' : 'Use /v1/videos (Async)' }}</span>
+                                    <span class="text-[10px] text-gray-400 dark:text-gray-500">{{ config.isSync ? 'Use /v1/chat/completions' : 'Use /v1/videos (Async)' }}</span>
                                 </div>
                                 <button 
                                     @click="config.isSync = !config.isSync" 
