@@ -29,7 +29,7 @@ watch(() => props.logs.length, () => {
 ( <span class="eye">o</span>.<span class="eye">o</span> )
 /> <\</pre>
             <span class="animate-pulse mb-2">{{ t('logConsole.waiting') }}</span>
-            <a href="https://afdian.com/a/mintimate" target="_blank" class="text-xs text-purple-200 dark:text-purple-300 hover:text-purple-400 dark:hover:text-purple-200 transition-colors mt-1">
+            <a href="https://ifdian.net/a/mintimate" target="_blank" class="text-xs text-purple-200 dark:text-purple-300 hover:text-purple-400 dark:hover:text-purple-200 transition-colors mt-1">
                 {{ t('logConsole.support') }}
             </a>
         </div>

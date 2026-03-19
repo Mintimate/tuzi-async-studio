@@ -80,7 +80,7 @@ const { t } = useI18n();
             <p class="opacity-90 dark:opacity-80">{{ t('usageGuide.tip.content') }}</p>
         </div>
     </div>    <!-- <div class="mt-6 text-center">
-        <a href="https://afdian.com/a/mintimate" target="_blank" class="inline-flex items-center gap-1 text-xs text-gray-400 hover:text-indigo-500 transition-colors">
+        <a href="https://ifdian.net/a/mintimate" target="_blank" class="inline-flex items-center gap-1 text-xs text-gray-400 hover:text-indigo-500 transition-colors">
             <span>⚡</span> 支持一下 (爱发电)
         </a>
     </div> -->
