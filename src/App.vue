@@ -9,6 +9,7 @@ import ResultDisplay from './components/ResultDisplay.vue';
 import SiteStats from './components/SiteStats.vue';
 import UsageGuide from './components/UsageGuide.vue';
 import VideoForm from './components/VideoForm.vue';
+import WatermarkRemover from './components/WatermarkRemover.vue';
 import Wwads from './components/Wwads.vue';
 
 const { t, locale } = useI18n();
@@ -188,7 +189,7 @@ watch(themeMode, (val) => {
     applyTheme();
 });
 
-const activeTab = ref('image'); // 'image' | 'video'
+const activeTab = ref('image'); // 'image' | 'video' | 'watermark'
 
 const loading = reactive({
     submit: false,
@@ -758,18 +759,24 @@ const queryTask = async () => {
                             <button 
                                 @click="activeTab = 'image'"
                                 :class="activeTab === 'image' ? 'bg-indigo-600 text-white' : 'bg-gray-50/50 dark:bg-gray-700/50 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600'"
-                                class="w-1/2 py-4 text-center text-sm font-bold transition-all duration-200">
+                                class="w-1/3 py-4 text-center text-sm font-bold transition-all duration-200">
                                 🖼️ {{ t('tabs.image') }}
                             </button>
                             <button 
                                 @click="activeTab = 'video'"
                                 :class="activeTab === 'video' ? 'bg-purple-600 text-white' : 'bg-gray-50/50 dark:bg-gray-700/50 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600'"
-                                class="w-1/2 py-4 text-center text-sm font-bold transition-all duration-200">
+                                class="w-1/3 py-4 text-center text-sm font-bold transition-all duration-200">
                                 🎬 {{ t('tabs.video') }}
+                            </button>
+                            <button 
+                                @click="activeTab = 'watermark'"
+                                :class="activeTab === 'watermark' ? 'bg-emerald-600 text-white' : 'bg-gray-50/50 dark:bg-gray-700/50 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600'"
+                                class="w-1/3 py-4 text-center text-sm font-bold transition-all duration-200">
+                                ✨ {{ t('tabs.watermark') }}
                             </button>
                         </div>
                         
-                        <div class="bg-indigo-600 h-1" :class="activeTab === 'video' ? 'bg-purple-600' : 'bg-indigo-600'"></div>
+                        <div class="h-1" :class="activeTab === 'video' ? 'bg-purple-600' : activeTab === 'watermark' ? 'bg-emerald-600' : 'bg-indigo-600'"></div>
                         
                         <!-- Content -->
                         <div v-show="activeTab === 'image'">
@@ -786,6 +793,11 @@ const queryTask = async () => {
                                 :loading="loading.submit" 
                                 :isActive="activeTab === 'video'"
                                 @submit="submitTask" 
+                                @log="({content, type}) => addLog(content, type)"
+                            />
+                        </div>
+                        <div v-show="activeTab === 'watermark'">
+                            <WatermarkRemover
                                 @log="({content, type}) => addLog(content, type)"
                             />
                         </div>

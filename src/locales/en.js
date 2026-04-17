@@ -26,7 +26,8 @@ export default {
   },
   tabs: {
     image: 'Image Gen',
-    video: 'Video Gen'
+    video: 'Video Gen',
+    watermark: 'Watermark Remover'
   },
   status: {
     title: 'Task Status',
@@ -206,5 +207,33 @@ export default {
     last30DaysVisits: 'Last 30 Days Visits',
     last30DaysImages: 'Last 30 Days Generated',
     totalImages: 'Total Generated'
+  },
+  watermark: {
+    upload: {
+      text: 'Click or drag Gemini generated images here',
+      hint: 'Supports JPG, PNG, WebP, multiple files'
+    },
+    processing: 'Processing...',
+    fileCount: '{total} file(s), {done} completed',
+    downloadAll: 'Download All',
+    clearAll: 'Clear All',
+    original: 'Original',
+    result: 'Watermark Removed',
+    error: 'Failed',
+    waiting: 'Waiting',
+    download: 'Download',
+    remove: 'Remove',
+    poweredBy: 'Watermark removal powered by',
+    privacyNote: '🔒 Pure browser-side processing, images never leave your device',
+    logs: {
+      filesAdded: '{count} image(s) added',
+      startProcessing: 'Processing {count} image(s)...',
+      removed: 'Watermark removed',
+      noWatermark: 'No watermark detected',
+      processFailed: 'Processing failed',
+      engineFailed: 'Engine initialization failed',
+      allDone: 'All processing completed',
+      invalidFile: 'Unsupported format or file too large (max 20MB)'
+    }
   }
 }

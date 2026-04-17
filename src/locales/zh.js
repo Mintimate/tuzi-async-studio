@@ -26,7 +26,8 @@ export default {
   },
   tabs: {
     image: '图像生成',
-    video: '视频生成'
+    video: '视频生成',
+    watermark: '去水印'
   },
   status: {
     title: '任务状态',
@@ -206,5 +207,33 @@ export default {
     last30DaysVisits: '最近30天访客',
     last30DaysImages: '最近30天生成',
     totalImages: '累计生成'
+  },
+  watermark: {
+    upload: {
+      text: '点击选择或拖拽 Gemini 生成的图片至此',
+      hint: '支持 JPG, PNG, WebP，可多选'
+    },
+    processing: '正在处理中...',
+    fileCount: '共 {total} 张，已完成 {done} 张',
+    downloadAll: '全部下载',
+    clearAll: '清空全部',
+    original: '原图',
+    result: '去水印后',
+    error: '处理失败',
+    waiting: '等待处理',
+    download: '下载',
+    remove: '移除',
+    poweredBy: '去水印能力由',
+    privacyNote: '🔒 纯浏览器本地处理，图片不会上传到任何服务器',
+    logs: {
+      filesAdded: '已添加 {count} 张图片',
+      startProcessing: '开始处理 {count} 张图片...',
+      removed: '水印已去除',
+      noWatermark: '未检测到水印',
+      processFailed: '处理失败',
+      engineFailed: '引擎初始化失败',
+      allDone: '全部处理完成',
+      invalidFile: '不支持的文件格式或文件过大 (最大 20MB)'
+    }
   }
 }
